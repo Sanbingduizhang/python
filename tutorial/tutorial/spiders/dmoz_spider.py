@@ -1,23 +1,38 @@
-import scrapy
+# import scrapy
+# from tutorial.items import DmozItem
+#
+
+from scrapy.spiders import Spider
+from scrapy.selector import Selector
+
 from tutorial.items import DmozItem
 
 
-class DmozSpider(scrapy.Spider):
-    name = "dmoz"
-    allowed_domains = ["dmoz.org"]
+class DmozSpider(Spider):
+    name = "baidu"
+    allowed_domains = ["baidu.com"]
     start_urls = [
         "http://news.baidu.com/"
     ]
 
     def parse(self, response):
-        for href in response.css("ul.directory.dir-col > li > a::attr('href')"):
-            url = response.urljoin(response.url, href.extract())
-            yield scrapy.Request(url, callback=self.parse_dir_contents)
+        """
+        The lines below is a spider contract. For more info see:
+        http://doc.scrapy.org/en/latest/topics/contracts.html
+        @url http://www.dmoz.org/Computers/Programming/Languages/Python/Resources/
+        @scrapes name
+        """
+        sites = response.css('#site-list-content > div.site-item > div.title-and-desc')
+        items = []
 
-    def parse_dir_contents(self, response):
-        for sel in response.xpath('//ul/li'):
+        for site in sites:
             item = DmozItem()
-            item['title'] = sel.xpath('a/text()').extract()
-            item['link'] = sel.xpath('a/@href').extract()
-            item['desc'] = sel.xpath('text()').extract()
-            yield item
+            item['name'] = site.css(
+                'a > div.site-title::text').extract_first().strip()
+            item['url'] = site.xpath(
+                'a/@href').extract_first().strip()
+            item['description'] = site.css(
+                'div.site-descr::text').extract_first().strip()
+            items.append(item)
+
+        return items
