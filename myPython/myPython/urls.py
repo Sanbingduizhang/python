@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import *
 
-from . import views, testdb, search
+from . import views, testdb, search, search2
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^testdb$', testdb.add_test_db),
     url(r'^gettest$', testdb.get_test_data),
 
-    url(r'^search_form$', search.search_form),
+    url(r'^search-form$', search.search_form),
     url(r'^search$', search.search),
+    url(r'^search-post$', search2.search_post),
 ]
